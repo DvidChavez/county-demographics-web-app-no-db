@@ -16,9 +16,14 @@ def home():
 def render_fact():
     states = get_state_options()
     state = request.args.get('state')
+    
     county = county_most_under_18(state)
+    county2 = county_most_Nonfarm_Employment(state)
+    
+    fact2 = "In " + state + ", the county with the most Private Non-farm Employment is " + county2 + "."
+    
     fact = "In " + state + ", the county with the highest percentage of under 18 year olds is " + county + "."
-    return render_template('home.html', state_options=states, funFact=fact)
+    return render_template('home.html', state_options=states, funFact=fact, funFact2=fact2)
     
 def get_state_options():
     """Return the html code for the drop down menu.  Each option is a state abbreviation from the demographic data."""
@@ -45,6 +50,20 @@ def county_most_under_18(state):
                 highest = c["Age"]["Percent Under 18 Years"]
                 county = c["County"]
     return county
+    
+def county_most_Nonfarm_Employment(state):
+    """Return the name of a county in the given state with the most Non-farm Employment."""
+    with open('demographics.json') as demographics_data:
+        counties = json.load(demographics_data)
+    highest=0
+    county = ""
+    for c in counties:
+        if c["State"] == state:
+            if c["Employment"]["Nonemployer Establishments"] > highest:
+                highest = c["Employment"]["Nonemployer Establishments"]
+                county = c["County"]
+    return county
+
 
 def is_localhost():
     """ Determines if app is running on localhost or not
@@ -56,4 +75,6 @@ def is_localhost():
 
 
 if __name__ == '__main__':
-    app.run(debug=False) # change to False when running in production
+    app.run(debug=True) # change to False when running in production
+
+county_most_Nonfarm_Employment
